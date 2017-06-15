@@ -5,21 +5,13 @@ require_once __DIR__.'/../vendor/autoload.php';
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-$app = new Silex\Application();
+$app = new Backupz\Application();
 $app['debug'] = true;
-
-$app->register(new Silex\Provider\VarDumperServiceProvider());
-$app->register(
-    new GeckoPackages\Silex\Services\Config\ConfigServiceProvider(),
-    [
-        'config.dir' => __DIR__.'/../app/config',
-        'config.format' => '%key%.yml'
-    ]
-);
-
+$app->initilize();
 
 $app->get('/', function () use ($app) {
-    $sftp = new \Backupz\Storage\SFTP($app);
+
+    var_dump($app['storage']->listAllFiles());
 
     return $app->json(true);
 });

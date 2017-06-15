@@ -4,7 +4,6 @@
 */
 namespace Backupz\Storage;
 
-use League\Flysystem\Filesystem;
 use Silex\Application;
 
 abstract class StorageBase
@@ -15,32 +14,24 @@ abstract class StorageBase
     protected $app;
 
     /**
+     * Config for the Flysystem adapter
+     * @var array
+     */
+    protected $config;
+
+    /**
      * Flysystem adapter
      */
     protected $atapter;
 
-    /**
-     * @var League\Flysystem\Filesystem
-     */
-    protected $filesystem;
-
-    public function __construct($app)
+    public function setAdapter($adapter)
     {
-        $this->setContainer($app);
-        try {
-            $this->configure();
-            $this->connect();
-        } catch (\Exception $e) {
-        }
-
-        $filesystem = $this->getFilesystem();
-        var_dump($filesystem->listContents());
+        $this->adapter = $adapter;
     }
 
-    protected function connect()
+    public function getAdapter()
     {
-        $filesystem = new Filesystem($this->getAdapter());
-        $this->setFilesystem($filesystem);
+        return $this->adapter;
     }
 
     protected function setContainer(Application $app)
@@ -53,31 +44,27 @@ abstract class StorageBase
         return $this->app;
     }
 
-    public function setFilesystem(Filesystem $filesystem)
+    protected function setConfig($config)
     {
-        $this->filesystem = $filesystem;
-    }
-
-    public function getFilesystem()
-    {
-        return $this->filesystem;
-    }
-
-    public function setAdapter($adapter)
-    {
-        $this->adapter = $adapter;
-    }
-
-    public function getAdapter()
-    {
-        return $this->adapter;
+        $this->config = $config;
     }
 
     public function getConfig()
     {
-        $app = $this->getContainer();
-
-        return $app['config']['config'];
+        return $this->config;
     }
 
+    public function __construct(Application $app, array $config)
+    {
+        $this->setContainer($app);
+        $this->setConfig($config);
+        try {
+            $adapter = $this->configure();
+        } catch (\Exception $e) {
+        }
+
+        $this->setAdapter($adapter);
+
+        return $adapter;
+    }
 }

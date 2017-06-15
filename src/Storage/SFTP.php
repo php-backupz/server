@@ -11,8 +11,9 @@ class SFTP extends StorageBase implements StorageInterface
     public function configure()
     {
         $config = $this->getConfig();
-        $adapter = new SftpAdapter($config["storage"]);
-        $this->setAdapter($adapter);
+        $adapter = new SftpAdapter($config);
+
+        return $adapter;
     }
 }
 
