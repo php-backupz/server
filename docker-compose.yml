@@ -2,9 +2,11 @@ version: '2'
 
 services:
     php:
-        image: koolserve/php:latest
+        image: php:7.0-fpm-alpine
         volumes:
             - ./public/index.php:/var/www/html/public/index.php
+            - ./app:/var/www/html/app
+            - ./src:/var/www/html/src
             - ./vendor:/var/www/html/vendor
     nginx:
         image: nginx:alpine

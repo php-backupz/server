@@ -1,0 +1,7 @@
+storage:
+    type: sftp
+    host:
+    port: 22
+    username:
+    password:
+    root:
