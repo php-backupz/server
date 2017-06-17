@@ -34,10 +34,8 @@ class Database extends Base
         $this->dump = $dump;
     }
 
-    public function __construct(Application $app)
+    public function initilize()
     {
-        parent::__construct($app);
-
         $file = tempnam('/tmp', 'dump-');
         $this->setFile($file);
 
