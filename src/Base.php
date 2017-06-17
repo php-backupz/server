@@ -7,7 +7,7 @@ namespace Backupz;
 abstract class Base
 {
     /**
-     * @var Silex\Application
+     * @var \Silex\Application
      */
     protected $app;
 

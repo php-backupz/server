@@ -13,10 +13,10 @@ class Storage extends Base
     /**
      * Flysystem adapter
      */
-    protected $atapter;
+    protected $adapter;
 
     /**
-     * @var League\Flysystem\Filesystem
+     * @var \League\Flysystem\Filesystem
      */
     protected $filesystem;
 
