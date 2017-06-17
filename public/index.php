@@ -11,7 +11,10 @@ $app->initilize();
 
 $app->get('/', function () use ($app) {
 
-    var_dump($app['storage']->listAllFiles());
+    //var_dump($app['storage']->listAllFiles());
+
+    $database = new Backupz\Backup\Database($app);
+    $database->run();
 
     return $app->json(true);
 });

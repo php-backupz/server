@@ -1,5 +1,7 @@
 <?php
-
+/**
+* @author Chris Hilsdon <chris@koolserve.uk>
+*/
 namespace Backupz;
 
 abstract class Base
@@ -28,5 +30,11 @@ abstract class Base
     public function getContainer()
     {
         return $this->app;
+    }
+
+    public function getConfig()
+    {
+        $app = $this->getContainer();
+        return $app['config']['config'];
     }
 }

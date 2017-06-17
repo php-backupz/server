@@ -16,4 +16,3 @@ class SFTP extends StorageBase implements StorageInterface
         return $adapter;
     }
 }
-

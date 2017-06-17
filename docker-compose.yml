@@ -2,7 +2,7 @@ version: '2'
 
 services:
     php:
-        image: php:7.0-fpm-alpine
+        build: .
         volumes:
             - ./public/index.php:/var/www/html/public/index.php
             - ./app:/var/www/html/app

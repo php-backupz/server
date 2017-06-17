@@ -1,9 +1,12 @@
 <?php
-
+/**
+* @author Chris Hilsdon <chris@koolserve.uk>
+*/
 namespace Backupz\Storage;
 
 use Backupz\Base;
 use League\Flysystem\Filesystem;
+use League\Flysystem\Adapter\Local;
 
 class Storage extends Base
 {
@@ -47,7 +50,7 @@ class Storage extends Base
     {
         //TODO Make this more reliable / refactor
         $app = $this->getContainer();
-        $config = $app['config']['config'];
+        $config = $this->getConfig();
         $storage = $config['storage'];
 
         switch ($storage['type']) {
@@ -71,5 +74,22 @@ class Storage extends Base
         $list = $filesystem->listContents();
 
         var_dump($list);
+    }
+
+    public function getLocal()
+    {
+        $adapter = new Local('/tmp');
+        $filesystem = new Filesystem($adapter);
+
+        return $filesystem;
+    }
+
+    public function moveToRemote($localPath, $remotePath)
+    {
+        $local = $this->getLocal();
+        $remote = $this->getFilesystem();
+
+        $contents = $local->readAndDelete($localPath);
+        $remote->put($remotePath, $contents);
     }
 }
