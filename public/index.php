@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,11 +10,11 @@ $app['debug'] = true;
 $app->initilize();
 
 $app->get('/', function () use ($app) {
+    // $database = new Backupz\Backup\Database($app);
+    // $database->run();
 
-    //var_dump($app['storage']->listAllFiles());
-
-    $database = new Backupz\Backup\Database($app);
-    $database->run();
+    $files = new Backupz\Backup\Files($app);
+    $files->run();
 
     return $app->json(true);
 });
