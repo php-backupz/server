@@ -25,6 +25,9 @@ class Storage extends Base
         $this->adapter = $adapter;
     }
 
+    /**
+     * @return \League\Flysystem\AdapterInterface
+     */
     public function getAdapter()
     {
         return $this->adapter;

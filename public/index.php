@@ -9,7 +9,7 @@ $app = new Backupz\Application();
 $app['debug'] = true;
 $app->initilize();
 
-$app->get('/', function () use ($app) {
+$app->get('/', function() use ($app) {
     // $database = new Backupz\Backup\Database($app);
     // $database->run();
 
