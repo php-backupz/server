@@ -1,2 +1,5 @@
 app/config/*.yml
 vendor/
+
+var/
+!.gitkeep

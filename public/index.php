@@ -14,7 +14,7 @@ $app->get('/', function() use ($app) {
     // $database->run();
 
     $files = new Backupz\Backup\Files($app);
-    $files->run();
+    $files->runForAll();
 
     return $app->json(true);
 });

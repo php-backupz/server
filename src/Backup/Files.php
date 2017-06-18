@@ -29,13 +29,15 @@ class Files extends Base
      */
     protected $path;
 
+    protected $name;
+
     public function getExcluded()
     {
         return $this->excluded;
     }
 
     /**
-     * @param string $excluded
+     * @param array $excluded
      */
     public function setExcluded($excluded)
     {
@@ -66,19 +68,6 @@ class Files extends Base
     public function setPath($path)
     {
         $this->path = $path;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initilize()
-    {
-        $filename = '/tmp/' . time() . '.zip';
-        $this->setFilename($filename);
-
-        $config = $this->getConfig();
-        $path = $config['websites']['path'];
-        $this->setPath($path);
     }
 
     /**
@@ -121,26 +110,56 @@ class Files extends Base
     }
 
     /**
-     * Get the name of the local
-     * @return [type] [description]
+     * Get the name of the local file
+     * @return string
      */
     public function getTmpFilename()
     {
         $filename = $this->getFilename();
 
-        return str_replace('/tmp/', '', $filename);
+        return str_replace($this->app['varPath'] . '/', '', $filename);
+    }
+
+    /**
+     * Run a backup for each of the top level directory
+     */
+    public function runForAll()
+    {
+        $remote = $this->getRemoteAdapter();
+        $tld = $remote->listContents();
+
+        foreach ($tld as $directory) {
+            if ($directory['type'] !== 'dir') {
+                continue;
+            }
+
+            $this->run($directory['path']);
+        }
+
     }
 
     /**
      * Run the backup
      * @return boolean Did the backup run successfully?
      */
-    public function run()
+    public function run($name = '')
     {
-        $path = $this->getPath();
+        $filename = $this->app['varPath'] . '/' . time() . '.zip';
+        $this->setFilename($filename);
+
+        if ($name === '') {
+            $name = $this->getPath();
+        }
+        $this->name = $name;
+
         $remote = $this->getRemoteAdapter();
         $zip = $this->getZipAdapter();
-        $contents = $remote->listContents($path . '/public/files', true);
+        $contents = $remote->listContents($name . '/public/files', true);
+
+        // If there are no files to be backed up
+        if ($contents === []) {
+            return true;
+        }
 
         foreach ($contents as $info) {
             // Only add files to the zip
@@ -153,16 +172,15 @@ class Files extends Base
                 continue;
             }
 
-            $file = $remote->read($info['path']);
-
             // Check for access to the remote file and then add it to the zip file
+            $file = $remote->read($info['path']);
             if ($file) {
                 $zip->write($info['path'], $file);
             }
         }
 
         // Close and save the zip file
-        $zip->getAdapter()->getArchive()->close();
+        $zip = null;
 
         // Upload the zip file to the remote server
         $save = $this->save();
@@ -178,9 +196,8 @@ class Files extends Base
     {
         $app = $this->getContainer();
         $filename = $this->getTmpFilename();
-        $path = $this->getPath();
 
-        $app['storage']->moveToRemote($filename, 'files/' . $path . '/' . $filename);
+        $app['storage']->moveToRemote($filename, 'files/' . $this->name . '/' . $filename);
 
         return true;
     }

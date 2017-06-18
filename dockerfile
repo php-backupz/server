@@ -23,4 +23,6 @@ RUN docker-php-ext-install -j "$(getconf _NPROCESSORS_ONLN)" \
     json \
     pdo_mysql \
     xml \
-    zip \
+    zip
+
+RUN mkdir /var/www/html/var && chmod 777 /var/www/html/var

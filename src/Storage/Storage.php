@@ -81,7 +81,8 @@ class Storage extends Base
 
     public function getLocal()
     {
-        $adapter = new Local('/tmp');
+        $app = $this->getContainer();
+        $adapter = new Local($app['varPath']);
         $filesystem = new Filesystem($adapter);
 
         return $filesystem;
