@@ -4,7 +4,6 @@
 */
 namespace Backupz\Backup;
 
-use Backupz\Application;
 use Backupz\Base;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Sftp\SftpAdapter;
@@ -33,6 +32,9 @@ class Files extends Base
         return $this->filename;
     }
 
+    /**
+     * @param string $filename
+     */
     public function setFilename($filename)
     {
         $this->filename = $filename;
@@ -50,7 +52,7 @@ class Files extends Base
 
     public function initilize()
     {
-        $filename = '/tmp/'.time().'.zip';
+        $filename = '/tmp/' . time() . '.zip';
         $this->setFilename($filename);
 
         $config = $this->getConfig();
