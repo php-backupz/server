@@ -5,6 +5,7 @@
 namespace Backupz;
 
 use GeckoPackages\Silex\Services\Config\ConfigServiceProvider;
+use Knp\Provider\ConsoleServiceProvider;
 use Silex\Application as SilexApplication;
 
 class Application extends SilexApplication
@@ -15,6 +16,10 @@ class Application extends SilexApplication
         $app->register(new ConfigServiceProvider(), [
             'config.dir' => __DIR__ . '/../app/config',
             'config.format' => '%key%.yml'
+        ])->register(new ConsoleServiceProvider(), [
+            'console.name' => 'Backupz',
+            'console.version' => '@DEV',
+            'console.project_directory' => __DIR__.'/..'
         ]);
 
         $app['storage'] = function() use ($app) {

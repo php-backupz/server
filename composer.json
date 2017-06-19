@@ -11,6 +11,8 @@
         "league/flysystem-ziparchive": "^1.0",
         "gecko-packages/gecko-silex-config-service": "^2.0",
         "symfony/yaml": "^3.3",
-        "ifsnop/mysqldump-php": "2.*"
+        "symfony/console": "^3.3",
+        "ifsnop/mysqldump-php": "2.*",
+        "knplabs/console-service-provider": "2.*"
     }
 }

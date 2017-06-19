@@ -1,0 +1,20 @@
+#!/usr/bin/env php
+<?php
+/**
+* @author Chris Hilsdon <chris@koolserve.uk>
+*/
+
+namespace Backupz;
+
+umask(0000);
+set_time_limit(0);
+date_default_timezone_set('Europe/London');
+
+require_once __DIR__.'/vendor/autoload.php';
+
+$app = new Application();
+$app->initilize();
+
+$application = $app['console'];
+$application->add(new Console\Backup\Files($app));
+$application->run();

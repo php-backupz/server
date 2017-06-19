@@ -8,6 +8,7 @@ use Backupz\Base;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Sftp\SftpAdapter;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class Files extends Base
 {
@@ -31,19 +32,27 @@ class Files extends Base
 
     protected $name;
 
+    /**
+     * Get filename
+     */
     public function getExcluded()
     {
         return $this->excluded;
     }
 
     /**
-     * @param array $excluded
+     * Set excluded
+     * @param \Backupz\Files
      */
     public function setExcluded($excluded)
     {
         $this->excluded = $excluded;
     }
 
+    /**
+     * Get filename
+     * @return [type] [description]
+     */
     public function getFilename()
     {
         return $this->filename;
@@ -125,6 +134,7 @@ class Files extends Base
      */
     public function runForAll()
     {
+        $app = $this->getContainer();
         $remote = $this->getRemoteAdapter();
         $tld = $remote->listContents();
 
@@ -133,50 +143,80 @@ class Files extends Base
                 continue;
             }
 
-            $this->run($directory['path']);
-        }
+            $path = $directory['path'];
 
+            if ($app['console']) {
+                $app['console']->output->writeln('Starting backup of ' . $path);
+            }
+
+            $this->run($directory['path']);
+
+            if ($app['console']) {
+                $app['console']->output->writeln('<info>Finished!</info>');
+            }
+        }
     }
 
     /**
      * Run the backup
      * @return boolean Did the backup run successfully?
      */
-    public function run($name = '')
+    public function run($name)
     {
-        $filename = $this->app['varPath'] . '/' . time() . '.zip';
+        $app = $this->getContainer();
+        $filename = $app['varPath'] . '/' . time() . '.zip';
         $this->setFilename($filename);
-
-        if ($name === '') {
-            $name = $this->getPath();
-        }
         $this->name = $name;
 
         $remote = $this->getRemoteAdapter();
         $zip = $this->getZipAdapter();
-        $contents = $remote->listContents($name . '/public/files', true);
+        $contents = $remote->listContents($this->name . '/public/files', true);
 
         // If there are no files to be backed up
         if ($contents === []) {
             return true;
         }
 
-        foreach ($contents as $info) {
+        $files = [];
+        foreach ($contents as $key => $info) {
+            $path = $info['path'];
+
             // Only add files to the zip
             if ($info['type'] === 'dir') {
                 continue;
             }
 
             // Check that this file shouldn't be excluded
-            if ($this->isExcluded($info['path'])) {
+            if ($this->isExcluded($path)) {
                 continue;
             }
 
-            // Check for access to the remote file and then add it to the zip file
-            $file = $remote->read($info['path']);
-            if ($file) {
-                $zip->write($info['path'], $file);
+            $files[] = $path;
+        }
+
+        if ($app['console']) {
+            $progress = new ProgressBar($app['console']->output, count($files));
+            $progress->setFormatDefinition('custom', "%message% \n%current%/%max% [%bar%]");
+            $progress->setFormat('custom');
+        }
+
+        foreach ($files as $index => $path) {
+
+            if ($app['console']) {
+                $progress->setMessage('Adding: ' . $path);
+                $progress->advance();
             }
+
+            // Check for access to the remote file and then add it to the zip file
+            $file = $remote->read($path);
+            if ($file) {
+                $zip->write($path, $file);
+            }
+        }
+
+        if ($app['console']) {
+            $progress->finish();
+            $app['console']->output->writeln('');
         }
 
         // Close and save the zip file
@@ -196,8 +236,18 @@ class Files extends Base
     {
         $app = $this->getContainer();
         $filename = $this->getTmpFilename();
+        $remotePath = 'files/' . $this->name . '/' . $filename;
 
-        $app['storage']->moveToRemote($filename, 'files/' . $this->name . '/' . $filename);
+        if ($app['console']) {
+            $app['console']->output->writeln('Uploading to storage');
+            $app['console']->output->writeln('filename: ' . $remotePath);
+        }
+
+        $app['storage']->moveToRemote($filename, $remotePath);
+
+        if ($app['console']) {
+            $app['console']->output->writeln('Finished upload');
+        }
 
         return true;
     }
