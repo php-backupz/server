@@ -36,7 +36,7 @@ class Database extends Base
 
     public function initilize()
     {
-        $file = tempnam('/tmp', 'dump-');
+        $file = tempnam($this->app['varPath'], 'dump-');
         $this->setFile($file);
 
         $dump = new Mysqldump($this->getDSN(), $this->getUsername(), $this->getPassword());
@@ -80,7 +80,7 @@ class Database extends Base
     {
         $filename = $this->getFile();
 
-        return str_replace('/tmp', '', $filename);
+        return str_replace($this->app['varPath'], '', $filename);
     }
 
     public function run()

@@ -15,8 +15,7 @@ class Files extends Base
 {
     protected function configure()
     {
-        $this
-            ->setName("backup:files")
+        $this->setName("backup:files")
             ->setDescription("Run a backup of files")
             ->addArgument(
                 'name',

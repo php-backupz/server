@@ -16,5 +16,6 @@ $app = new Application();
 $app->initilize();
 
 $application = $app['console'];
+$application->add(new Console\Backup\Database($app));
 $application->add(new Console\Backup\Files($app));
 $application->run();
