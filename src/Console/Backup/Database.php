@@ -30,7 +30,7 @@ class Database extends Base
         $progress->advance();
 
         $backup = new BackupzDatabase($app);
-        $backup->run();
+        $backup->runForAll();
 
         $progress->finish('Done.');
 

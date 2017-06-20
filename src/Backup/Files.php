@@ -10,7 +10,7 @@ use League\Flysystem\Sftp\SftpAdapter;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter;
 use Symfony\Component\Console\Helper\ProgressBar;
 
-class Files extends Base
+class Files extends Base implements BackupInterface
 {
     /**
      * An array of paths that should be excluded from the backup

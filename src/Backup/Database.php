@@ -8,39 +8,32 @@ use Backupz\Application;
 use Backupz\Base;
 use Ifsnop\Mysqldump\Mysqldump;
 
-class Database extends Base
+class Database extends Base implements BackupInterface
 {
-    protected $file;
+    /**
+     * Name of the database to dump
+     * @var string
+     */
+    protected $database;
 
+    /**
+     * Instance of Mysqldump
+     * @var \Ifsnop\Mysqldump\Mysqldump
+     */
     protected $dump;
 
-    public function getFile()
-    {
-        return $this->file;
-    }
+    /**
+     * Full path of the file that will be used to dump the database to
+     * @var string
+     */
+    protected $file;
 
-    protected function setFile($file)
+    public function setupDump()
     {
-        $this->file = $file;
-    }
+        $this->file = tempnam($this->app['varPath'], 'dump-');
+        $this->dump = new Mysqldump($this->getDSN(), $this->getUsername(), $this->getPassword());
 
-    public function getDump()
-    {
         return $this->dump;
-    }
-
-    protected function setDump($dump)
-    {
-        $this->dump = $dump;
-    }
-
-    public function initilize()
-    {
-        $file = tempnam($this->app['varPath'], 'dump-');
-        $this->setFile($file);
-
-        $dump = new Mysqldump($this->getDSN(), $this->getUsername(), $this->getPassword());
-        $this->setDump($dump);
     }
 
     protected function getDSN()
@@ -48,7 +41,7 @@ class Database extends Base
         return sprintf(
             'mysql:host=%s;dbname=%s',
             $this->getHost(),
-            $this->getDatabase()
+            $this->database
         );
     }
 
@@ -56,12 +49,6 @@ class Database extends Base
     {
         $config = $this->getConfig();
         return $config['database']['host'];
-    }
-
-    protected function getDatabase()
-    {
-        $config = $this->getConfig();
-        return $config['database']['database'];
     }
 
     protected function getUsername()
@@ -76,23 +63,42 @@ class Database extends Base
         return $config['database']['password'];
     }
 
-    public function getTmpFilename()
+    protected function getTmpFilename()
     {
-        $filename = $this->getFile();
-
-        return str_replace($this->app['varPath'], '', $filename);
+        return str_replace($this->app['varPath'], '', $this->file);
     }
 
-    public function run()
+    protected function getAllDatabases()
     {
+        $dbh = new \PDO('mysql:host=' . $this->getHost(), $this->getUsername(), $this->getPassword());
+        $databases = [];
+        foreach($dbh->query('SHOW DATABASES') as $row){
+            $databases[] = $row['Database'];
+        }
+
+        return $databases;
+    }
+
+    public function runForAll()
+    {
+        $databases = $this->getAllDatabases();
+        foreach ($databases as $database) {
+            $this->run($database);
+        }
+    }
+
+    public function run($database)
+    {
+        $this->database = $database;
+        $dump = $this->setupDump();
+
         try {
-            $dump = $this->getDump();
-            $dump->start($this->getFile());
+            $dump->start($this->file);
         } catch (\Exception $e) {
             return false;
         }
 
-        if (file_exists($this->getFile())) {
+        if (file_exists($this->file)) {
             $this->save();
 
             return true;
@@ -105,8 +111,7 @@ class Database extends Base
     {
         $app = $this->getContainer();
         $filename = $this->getTmpFilename();
-        $databaseName = $this->getDatabase();
 
-        $app['storage']->moveToRemote($filename, 'databases/' . $databaseName . '/' . time() . '.sql');
+        $app['storage']->moveToRemote($filename, 'databases/' . $this->database . '/' . time() . '.sql');
     }
 }
