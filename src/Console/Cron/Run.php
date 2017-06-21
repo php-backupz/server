@@ -2,19 +2,20 @@
 /**
 * @author Chris Hilsdon <chris@koolserve.uk>
 */
-namespace Backupz\Console\Cache;
+namespace Backupz\Console\Cron;
 
 use Backupz\Console\Base;
+use Backupz\Cron;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Clear extends Base
+class Run extends Base
 {
     protected function configure()
     {
-        $this->setName("cache:clear")
-            ->setDescription("Clear the cache")
+        $this->setName("cron:run")
+            ->setDescription("Run the cron jobs")
         ;
     }
 
@@ -22,10 +23,9 @@ class Clear extends Base
     {
         $this->beforeExecute($input, $output);
         $app = $this->getContainer();
-        $storage = $app['storage'];
 
-        $cleared = $storage->clearCache();
-        $output->writeln('<info>Cleared ' . $cleared . ' files</info>');
+        $cron = new Cron($app);
+        $cron->run();
 
         return 1;
     }

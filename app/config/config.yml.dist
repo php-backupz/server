@@ -1,3 +1,8 @@
+cron:
+    tasks:
+        - files
+        - database
+
 storage:
     type: sftp
     host:

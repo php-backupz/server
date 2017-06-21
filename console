@@ -19,4 +19,5 @@ $application = $app['console'];
 $application->add(new Console\Backup\Database($app));
 $application->add(new Console\Backup\Files($app));
 $application->add(new Console\Cache\Clear($app));
+$application->add(new Console\Cron\Run($app));
 $application->run();
