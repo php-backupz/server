@@ -96,4 +96,26 @@ class Storage extends Base
         $contents = $local->readAndDelete($localPath);
         $remote->put($remotePath, $contents);
     }
+
+    /**
+     * Remove all of the temporary files created
+     * @return boolval The amount of files removed
+     */
+    public function clearCache()
+    {
+        $local = $this->getLocal();
+        $deleted = 0;
+
+        foreach ($local->listContents() as $object) {
+            // Don't delete the .gitkeep file
+            if ($object['basename'] === '.gitkeep') {
+                continue;
+            }
+
+            $local->delete($object['path']);
+            $deleted++;
+        }
+
+        return (int) $deleted;
+    }
 }
