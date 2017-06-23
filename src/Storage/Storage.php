@@ -5,6 +5,7 @@
 namespace Backupz\Storage;
 
 use Backupz\Base;
+use Backupz\Storage\Local as LocalStorage;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 
@@ -33,11 +34,19 @@ class Storage extends Base
         return $this->adapter;
     }
 
+    /**
+     * Set filesystem
+     * @param \League\Flysystem\Filesystem $filesystem
+     */
     public function setFilesystem(Filesystem $filesystem)
     {
         $this->filesystem = $filesystem;
     }
 
+    /**
+     * Get filesystem
+     * @return \League\Flysystem\Filesystem
+     */
     public function getFilesystem()
     {
         return $this->filesystem;
@@ -49,6 +58,9 @@ class Storage extends Base
         $this->connect();
     }
 
+    /**
+     * Setup the adapter using the configured remote
+     */
     private function configureAdapter()
     {
         //TODO Make this more reliable / refactor
@@ -57,6 +69,9 @@ class Storage extends Base
         $storage = $config['storage'];
 
         switch ($storage['type']) {
+            case 'local':
+                $adapter = new LocalStorage($app, $storage);
+                break;
             case 'sftp':
                 $adapter = new SFTP($app, $storage);
                 break;
@@ -65,20 +80,31 @@ class Storage extends Base
         $this->setAdapter($adapter->getAdapter());
     }
 
+    /**
+     * Connect to the filesystem
+     */
     private function connect()
     {
         $filesystem = new Filesystem($this->getAdapter());
         $this->setFilesystem($filesystem);
     }
 
+    /**
+     * List all of the files at the remote filesystem
+     * @return array
+     */
     public function listAllFiles()
     {
         $filesystem = $this->getFilesystem();
         $list = $filesystem->listContents();
 
-        var_dump($list);
+        return $list;
     }
 
+    /**
+     * Get local filesystem for storing data dumps
+     * @return \League\Flysystem\Filesystem
+     */
     public function getLocal()
     {
         $app = $this->getContainer();
@@ -88,6 +114,11 @@ class Storage extends Base
         return $filesystem;
     }
 
+    /**
+     * Move a local file to a remote filesystem
+     * @param string $localPath Reletive path to the the loacl adapter
+     * @param string $remotePath Reletive path to the the loacl adapter
+     */
     public function moveToRemote($localPath, $remotePath)
     {
         $local = $this->getLocal();
