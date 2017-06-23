@@ -25,11 +25,9 @@ class Files extends Base implements BackupInterface
     protected $filename;
 
     /**
-     * [$path description]
+     * The name of the direcorty to backup
      * @var string
      */
-    protected $path;
-
     protected $name;
 
     /**
@@ -42,7 +40,7 @@ class Files extends Base implements BackupInterface
 
     /**
      * Set excluded
-     * @param \Backupz\Files
+     * @param array An array of paths to be excluded from the backup
      */
     public function setExcluded($excluded)
     {
@@ -51,7 +49,7 @@ class Files extends Base implements BackupInterface
 
     /**
      * Get filename
-     * @return [type] [description]
+     * @return string
      */
     public function getFilename()
     {
@@ -64,19 +62,6 @@ class Files extends Base implements BackupInterface
     public function setFilename($filename)
     {
         $this->filename = $filename;
-    }
-
-    public function getPath()
-    {
-        return $this->path;
-    }
-
-    /**
-     * @param string $path
-     */
-    public function setPath($path)
-    {
-        $this->path = $path;
     }
 
     /**
