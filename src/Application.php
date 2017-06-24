@@ -26,6 +26,10 @@ class Application extends SilexApplication
             return new Storage\Storage($app);
         };
 
+        $app['log'] = function() use ($app) {
+            return new Log($app);
+        };
+
         $varPath = realpath(__DIR__ . '/../var');
         $app['varPath'] = function() use ($varPath) {
             return $varPath;

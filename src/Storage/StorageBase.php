@@ -22,7 +22,7 @@ abstract class StorageBase
     /**
      * Flysystem adapter
      */
-    protected $atapter;
+    protected $adapter;
 
     public function setAdapter($adapter)
     {

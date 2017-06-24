@@ -176,8 +176,14 @@ class Files extends Base implements BackupInterface
                 continue;
             }
 
-            $files[] = $path;
+            // Add it to the list of files to be saved
+            $files[] = [
+                'path' => $path,
+                'size' => $this->getReadableFilesize($info['size']),
+            ];
         }
+
+        $progress = false;
 
         if ($app['console']) {
             $progress = new ProgressBar($app['console']->output, count($files));
@@ -185,24 +191,25 @@ class Files extends Base implements BackupInterface
             $progress->setFormat('custom');
         }
 
-        foreach ($files as $index => $path) {
+        foreach ($files as $index => $file) {
+            $path = $file['path'];
 
-            if ($app['console']) {
-                $progress->setMessage('Adding: ' . $path);
+            if ($progress !== false) {
+                $progress->setMessage('['.$file['size'].']: ' . $path);
                 $progress->advance();
             }
 
             // Check for access to the remote file and then add it to the zip file
-            $file = $remote->read($path);
-            if ($file) {
-                $zip->write($path, $file);
+            $fileContents = $remote->read($path);
+            if ($fileContents !== false) {
+                $zip->write($path, $fileContents);
             }
         }
 
-        if ($app['console']) {
+        if ($progress !== false) {
             $progress->finish();
-            $app['console']->output->writeln('');
         }
+        $app['log']->output('');
 
         // Close and save the zip file
         $zip = null;
@@ -224,14 +231,14 @@ class Files extends Base implements BackupInterface
         $remotePath = 'files/' . $this->name . '/' . $filename;
 
         if ($app['console']) {
-            $app['console']->output->writeln('Uploading to storage');
-            $app['console']->output->writeln('filename: ' . $remotePath);
+            $app['log']->output('Uploading to storage');
+            $app['log']->output('filename: ' . $remotePath);
         }
 
         $app['storage']->moveToRemote($filename, $remotePath);
 
         if ($app['console']) {
-            $app['console']->output->writeln('Finished upload');
+            $app['log']->output('Finished upload');
         }
 
         return true;
