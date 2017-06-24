@@ -28,6 +28,12 @@ class Database extends Base implements BackupInterface
      */
     protected $file;
 
+    /**
+     * The remote directory to store the backups in
+     * @var string
+     */
+    protected $directory = 'databases';
+
     public function setupDump()
     {
         $this->file = tempnam($this->app['varPath'], 'dump-');
@@ -72,11 +78,55 @@ class Database extends Base implements BackupInterface
     {
         $dbh = new \PDO('mysql:host=' . $this->getHost(), $this->getUsername(), $this->getPassword());
         $databases = [];
-        foreach($dbh->query('SHOW DATABASES') as $row){
+        foreach ($dbh->query('SHOW DATABASES') as $row) {
+
+            // Skip backing up information_schema
+            if ($row['Database'] === 'information_schema') {
+                continue;
+            }
+
             $databases[] = $row['Database'];
         }
 
         return $databases;
+    }
+
+    public function listAll()
+    {
+        $remote = $this->app['storage']->getFilesystem();
+        $tld = $remote->listContents($this->directory);
+        $backups = [];
+
+        foreach ($tld as $directory) {
+            if ($directory['type'] !== 'dir') {
+                continue;
+            }
+
+            $name = $directory['basename'];
+            $databaseBackups = $this->getBackupsInDirectory($remote, $name);
+
+            // Only show databases with backups
+            if ($databaseBackups !== []) {
+                $backups[$name] = $databaseBackups;
+            }
+        }
+
+        return $backups;
+    }
+
+    private function getBackupsInDirectory($remote, $path)
+    {
+        $files = $remote->listContents($this->directory . '/' . $path);
+        $newFiles = [];
+        foreach ($files as $file) {
+            $time = date('d-m-y h:i', (int) $file['basename']);
+            $newFiles[] = [
+                'time' => $time,
+                'size' => $this->getReadableFilesize($file['size'])
+            ];
+        }
+
+        return $newFiles;
     }
 
     public function runForAll()
@@ -112,6 +162,9 @@ class Database extends Base implements BackupInterface
         $app = $this->getContainer();
         $filename = $this->getTmpFilename();
 
-        $app['storage']->moveToRemote($filename, 'databases/' . $this->database . '/' . time() . '.sql');
+        $app['storage']->moveToRemote(
+            $filename,
+            $this->directory . '/' . $this->database . '/' . time() . '.sql'
+        );
     }
 }

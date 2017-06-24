@@ -43,7 +43,7 @@ abstract class Base
      * @param int $size Filesize to be converted
      * @return string
      */
-    function getReadableFilesize($size)
+    public function getReadableFilesize($size)
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $power = $size > 0 ? floor(log($size, 1024)) : 0;

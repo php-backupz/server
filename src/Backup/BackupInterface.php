@@ -6,7 +6,8 @@ namespace Backupz\Backup;
 
 interface BackupInterface
 {
-    public function runForAll();
-    public function run($name);
+    public function listAll();
     public function save();
+    public function run($name);
+    public function runForAll();
 }

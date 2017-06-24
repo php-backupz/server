@@ -163,7 +163,7 @@ class Files extends Base implements BackupInterface
         }
 
         $files = [];
-        foreach ($contents as $key => $info) {
+        foreach ($contents as $info) {
             $path = $info['path'];
 
             // Only add files to the zip
@@ -191,7 +191,7 @@ class Files extends Base implements BackupInterface
             $progress->setFormat('custom');
         }
 
-        foreach ($files as $index => $file) {
+        foreach ($files as $file) {
             $path = $file['path'];
 
             if ($progress !== false) {
