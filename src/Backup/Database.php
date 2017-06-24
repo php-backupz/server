@@ -79,7 +79,6 @@ class Database extends Base implements BackupInterface
         $dbh = new \PDO('mysql:host=' . $this->getHost(), $this->getUsername(), $this->getPassword());
         $databases = [];
         foreach ($dbh->query('SHOW DATABASES') as $row) {
-
             // Skip backing up information_schema
             if ($row['Database'] === 'information_schema') {
                 continue;
@@ -94,10 +93,9 @@ class Database extends Base implements BackupInterface
     public function listAll()
     {
         $remote = $this->app['storage']->getFilesystem();
-        $tld = $remote->listContents($this->directory);
         $backups = [];
 
-        foreach ($tld as $directory) {
+        foreach ($remote->listContents($this->directory) as $directory) {
             if ($directory['type'] !== 'dir') {
                 continue;
             }

@@ -31,6 +31,12 @@ class Files extends Base implements BackupInterface
     protected $name;
 
     /**
+     * The remote directory to store the backups in
+     * @var string
+     */
+    protected $directory = 'files';
+
+    /**
      * Get filename
      */
     public function getExcluded()
@@ -112,6 +118,43 @@ class Files extends Base implements BackupInterface
         $filename = $this->getFilename();
 
         return str_replace($this->app['varPath'] . '/', '', $filename);
+    }
+
+    public function listAll()
+    {
+        $remote = $this->app['storage']->getFilesystem();
+        $backups = [];
+
+        foreach ($remote->listContents($this->directory) as $directory) {
+            if ($directory['type'] !== 'dir') {
+                continue;
+            }
+
+            $name = $directory['basename'];
+            $folderBackups = $this->getBackupsInDirectory($remote, $name);
+
+            // Only show folders with backups
+            if ($folderBackups !== []) {
+                $backups[$name] = $folderBackups;
+            }
+        }
+
+        return $backups;
+    }
+
+    private function getBackupsInDirectory($remote, $path)
+    {
+        $files = $remote->listContents($this->directory . '/' . $path);
+        $newFiles = [];
+        foreach ($files as $file) {
+            $time = date('d-m-y h:i', (int) $file['basename']);
+            $newFiles[] = [
+                'time' => $time,
+                'size' => $this->getReadableFilesize($file['size'])
+            ];
+        }
+
+        return $newFiles;
     }
 
     /**
@@ -228,7 +271,7 @@ class Files extends Base implements BackupInterface
     {
         $app = $this->getContainer();
         $filename = $this->getTmpFilename();
-        $remotePath = 'files/' . $this->name . '/' . $filename;
+        $remotePath = $this->directory . '/' . $this->name . '/' . $filename;
 
         if ($app['console']) {
             $app['log']->output('Uploading to storage');
