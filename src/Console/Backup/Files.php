@@ -12,6 +12,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Files extends Base
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this->setName("backup:files")
@@ -24,6 +27,9 @@ class Files extends Base
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->beforeExecute($input, $output);

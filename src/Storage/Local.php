@@ -8,6 +8,9 @@ use League\Flysystem\Adapter\Local as LocalAdapter;
 
 class Local extends StorageBase implements StorageInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function configure()
     {
         $config = $this->getConfig();

@@ -6,5 +6,8 @@ namespace Backupz\Storage;
 
 interface StorageInterface
 {
+    /**
+     * Configure the adapter
+     */
     public function configure();
 }

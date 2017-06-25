@@ -24,31 +24,54 @@ abstract class StorageBase
      */
     protected $adapter;
 
+    /**
+     * Set adapter
+     * @param \League\Flysystem\AdapterInterface $adapter A configured flysystem adapter
+     */
     public function setAdapter($adapter)
     {
         $this->adapter = $adapter;
     }
 
+    /**
+     * @return \League\Flysystem\AdapterInterface
+     */
     public function getAdapter()
     {
         return $this->adapter;
     }
 
+    /**
+     * Set container
+     * @param \Silex\Application $app
+     */
     protected function setContainer(Application $app)
     {
         $this->app = $app;
     }
 
+    /**
+     * Get container
+     * @return \Silex\Application
+     */
     public function getContainer()
     {
         return $this->app;
     }
 
+    /**
+     * Set adapter config
+     * @param array $config
+     */
     protected function setConfig($config)
     {
         $this->config = $config;
     }
 
+    /**
+     * Get config array
+     * @return array
+     */
     public function getConfig()
     {
         return $this->config;

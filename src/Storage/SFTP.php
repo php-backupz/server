@@ -8,6 +8,9 @@ use League\Flysystem\Sftp\SftpAdapter;
 
 class SFTP extends StorageBase implements StorageInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function configure()
     {
         $config = $this->getConfig();

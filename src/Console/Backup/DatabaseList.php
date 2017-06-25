@@ -14,6 +14,9 @@ use Symfony\Component\Console\Helper\TableSeparator;
 
 class DatabaseList extends Base
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this->setName("backup:database:list")
@@ -21,6 +24,9 @@ class DatabaseList extends Base
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->beforeExecute($input, $output);

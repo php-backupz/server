@@ -21,6 +21,10 @@ class Storage extends Base
      */
     protected $filesystem;
 
+    /**
+     * Set adapter
+     * @param \League\Flysystem\AdapterInterface $adapter A configured flysystem adapter
+     */
     public function setAdapter($adapter)
     {
         $this->adapter = $adapter;
@@ -52,6 +56,9 @@ class Storage extends Base
         return $this->filesystem;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function initilize()
     {
         $this->configureAdapter();

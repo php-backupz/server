@@ -10,6 +10,9 @@ use Silex\Application as SilexApplication;
 
 class Application extends SilexApplication
 {
+    /**
+     * Register service providers and setup the application
+     */
     public function initilize()
     {
         $app = $this;
@@ -22,16 +25,16 @@ class Application extends SilexApplication
             'console.project_directory' => __DIR__.'/..'
         ]);
 
-        $app['storage'] = function() use ($app) {
+        $app['storage'] = function () use ($app) {
             return new Storage\Storage($app);
         };
 
-        $app['log'] = function() use ($app) {
+        $app['log'] = function () use ($app) {
             return new Log($app);
         };
 
         $varPath = realpath(__DIR__ . '/../var');
-        $app['varPath'] = function() use ($varPath) {
+        $app['varPath'] = function () use ($varPath) {
             return $varPath;
         };
     }

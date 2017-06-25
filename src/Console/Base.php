@@ -23,12 +23,20 @@ abstract class Base extends BaseCommand
         return $this->app;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function __construct(Application $app)
     {
         parent::__construct();
         $this->app = $app;
     }
 
+    /**
+     * Save the input and output to the app for later
+     * @param  InputInterface  $input
+     * @param  OutputInterface $output
+     */
     protected function beforeExecute(InputInterface $input, OutputInterface $output)
     {
         $this->app["console"]->input = $input;

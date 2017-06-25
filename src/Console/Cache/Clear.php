@@ -11,6 +11,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Clear extends Base
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this->setName("cache:clear")
@@ -18,6 +21,9 @@ class Clear extends Base
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->beforeExecute($input, $output);

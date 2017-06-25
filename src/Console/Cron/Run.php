@@ -12,6 +12,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Run extends Base
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this->setName("cron:run")
@@ -19,6 +22,9 @@ class Run extends Base
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->beforeExecute($input, $output);

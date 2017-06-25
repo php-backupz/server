@@ -17,21 +17,36 @@ abstract class Base
         $this->initilize();
     }
 
+    /**
+     * Initilize the class after running the class construct
+     */
     public function initilize()
     {
         // Empty
     }
 
+    /**
+     * Set container
+     * @param \Silex\Application $app
+     */
     protected function setContainer(Application $app)
     {
         $this->app = $app;
     }
 
+    /**
+     * Get container
+     * @return \Silex\Application
+     */
     public function getContainer()
     {
         return $this->app;
     }
 
+    /**
+     * Return the config array
+     * @return array
+     */
     public function getConfig()
     {
         $app = $this->getContainer();

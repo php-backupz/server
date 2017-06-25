@@ -13,6 +13,9 @@ use Symfony\Component\Console\Helper\ProgressIndicator;
 
 class Database extends Base
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this->setName("backup:database")
@@ -20,6 +23,9 @@ class Database extends Base
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->beforeExecute($input, $output);
