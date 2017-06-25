@@ -173,31 +173,19 @@ class Files extends Base implements BackupInterface
 
             $path = $directory['path'];
 
-            if ($app['console']) {
-                $app['console']->output->writeln('Starting backup of ' . $path);
-            }
-
-            $this->run($directory['path']);
-
-            if ($app['console']) {
-                $app['console']->output->writeln('<info>Finished!</info>');
-            }
+            $app['log']->output('Starting backup of ' . $path);
+            $this->run($path);
+            $app['log']->output('<info>Finished!</info>');
         }
     }
 
     /**
-     * Run the backup
-     * @return boolean Did the backup run successfully?
+     * Get all of the remote folders to backup
+     * @return array
      */
-    public function run($name)
+    protected function getRemoteContents()
     {
-        $app = $this->getContainer();
-        $filename = $app['varPath'] . '/' . time() . '.zip';
-        $this->setFilename($filename);
-        $this->name = $name;
-
         $remote = $this->getRemoteAdapter();
-        $zip = $this->getZipAdapter();
         $contents = $remote->listContents($this->name . '/public/files', true);
 
         // If there are no files to be backed up
@@ -225,6 +213,18 @@ class Files extends Base implements BackupInterface
                 'size' => $this->getReadableFilesize($info['size']),
             ];
         }
+    }
+
+    /**
+     * Run the backup
+     * @return boolean Did the backup run successfully?
+     */
+    public function run($name)
+    {
+        $app = $this->getContainer();
+        $filename = $app['varPath'] . '/' . time() . '.zip';
+        $this->setFilename($filename);
+        $this->name = $name;
 
         $progress = false;
 
@@ -233,6 +233,9 @@ class Files extends Base implements BackupInterface
             $progress->setFormatDefinition('custom', "%message% \n%current%/%max% [%bar%]");
             $progress->setFormat('custom');
         }
+
+        $zip = $this->getZipAdapter();
+        $remote = $this->getRemoteAdapter();
 
         foreach ($files as $file) {
             $path = $file['path'];
@@ -253,11 +256,11 @@ class Files extends Base implements BackupInterface
 
         if ($progress !== false) {
             $progress->finish();
+            $app['log']->output('');
         }
-        $app['log']->output('');
 
         // Close and save the zip file
-        $zip = null;
+        $zip->getAdapter()->getArchive()->close();
 
         // Upload the zip file to the remote server
         $save = $this->save();
