@@ -25,7 +25,7 @@ abstract class StorageBase
     protected $adapter;
 
     /**
-     * Set adapter
+     * Set flysystem adapter
      * @param \League\Flysystem\AdapterInterface $adapter A configured flysystem adapter
      */
     public function setAdapter($adapter)

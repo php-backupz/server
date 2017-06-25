@@ -190,7 +190,7 @@ class Files extends Base implements BackupInterface
 
         // If there are no files to be backed up
         if ($contents === []) {
-            return true;
+            return false;
         }
 
         $files = [];
@@ -213,6 +213,8 @@ class Files extends Base implements BackupInterface
                 'size' => $this->getReadableFilesize($info['size']),
             ];
         }
+
+        return $files;
     }
 
     /**
@@ -226,8 +228,14 @@ class Files extends Base implements BackupInterface
         $this->setFilename($filename);
         $this->name = $name;
 
-        $progress = false;
+        $files = $this->getRemoteContents();
+        if ($files === false) {
+            $app['log']->output('Skipping as there are no files to backup');
 
+            return true;
+        }
+
+        $progress = false;
         if ($app['console']) {
             $progress = new ProgressBar($app['console']->output, count($files));
             $progress->setFormatDefinition('custom', "%message% \n%current%/%max% [%bar%]");
