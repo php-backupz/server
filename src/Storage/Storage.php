@@ -115,17 +115,18 @@ class Storage extends Base
     }
 
     /**
-     * Move a local file to a remote filesystem
-     * @param string $localPath Reletive path to the the loacl adapter
-     * @param string $remotePath Reletive path to the the loacl adapter
+     * Move a local file to a remote filesystem using steams
+     * @param string $localPath Reletive path to the the local adapter
+     * @param string $remotePath Reletive path to the the remote adapter
      */
     public function moveToRemote($localPath, $remotePath)
     {
         $local = $this->getLocal();
         $remote = $this->getFilesystem();
 
-        $contents = $local->readAndDelete($localPath);
-        $remote->put($remotePath, $contents);
+        $stream = $local->readStream($localPath);
+        $remote->writeStream($remotePath, $stream);
+        fclose($stream);
     }
 
     /**

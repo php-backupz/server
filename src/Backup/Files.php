@@ -243,10 +243,12 @@ class Files extends Base implements BackupInterface
             }
 
             // Check for access to the remote file and then add it to the zip file
-            $fileContents = $remote->read($path);
-            if ($fileContents !== false) {
-                $zip->write($path, $fileContents);
+            $fileStream = $remote->readStream($path);
+            if ($fileStream !== false) {
+                $zip->writeStream($path, $fileStream);
             }
+            fclose($fileStream);
+            gc_collect_cycles();
         }
 
         if ($progress !== false) {
