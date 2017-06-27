@@ -15,16 +15,9 @@ class Application extends SilexApplication
      */
     public function initilize()
     {
-        $app = $this;
-        $app->register(new ConfigServiceProvider(), [
-            'config.dir' => __DIR__ . '/../app/config',
-            'config.format' => '%key%.yml'
-        ])->register(new ConsoleServiceProvider(), [
-            'console.name' => 'Backupz',
-            'console.version' => '@DEV',
-            'console.project_directory' => __DIR__.'/..'
-        ]);
+        $this->registerServices();
 
+        $app = $this;
         $app['storage'] = function () use ($app) {
             return new Storage\Storage($app);
         };
@@ -37,5 +30,21 @@ class Application extends SilexApplication
         $app['varPath'] = function () use ($varPath) {
             return $varPath;
         };
+    }
+
+    /**
+     * Register silex services
+     */
+    private function registerServices()
+    {
+        $app = $this;
+        $app->register(new ConfigServiceProvider(), [
+            'config.dir' => __DIR__ . '/../app/config',
+            'config.format' => '%key%.yml'
+        ])->register(new ConsoleServiceProvider(), [
+            'console.name' => 'Backupz',
+            'console.version' => '@DEV',
+            'console.project_directory' => __DIR__.'/..'
+        ]);
     }
 }

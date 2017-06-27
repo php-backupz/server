@@ -120,43 +120,6 @@ class Files extends Base implements BackupInterface
         return str_replace($this->app['varPath'] . '/', '', $filename);
     }
 
-    public function listAll()
-    {
-        $remote = $this->app['storage']->getFilesystem();
-        $backups = [];
-
-        foreach ($remote->listContents($this->directory) as $directory) {
-            if ($directory['type'] !== 'dir') {
-                continue;
-            }
-
-            $name = $directory['basename'];
-            $folderBackups = $this->getBackupsInDirectory($remote, $name);
-
-            // Only show folders with backups
-            if ($folderBackups !== []) {
-                $backups[$name] = $folderBackups;
-            }
-        }
-
-        return $backups;
-    }
-
-    private function getBackupsInDirectory($remote, $path)
-    {
-        $files = $remote->listContents($this->directory . '/' . $path);
-        $newFiles = [];
-        foreach ($files as $file) {
-            $time = date('d-m-y h:i', (int) $file['basename']);
-            $newFiles[] = [
-                'time' => $time,
-                'size' => $this->getReadableFilesize($file['size'])
-            ];
-        }
-
-        return $newFiles;
-    }
-
     /**
      * Run a backup for each of the top level directory
      */
